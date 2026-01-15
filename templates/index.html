@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasación Inteligente BMW</title>
+    <style>
+        :root {
+            --primary-color: #0066b1;
+            /* Azul BMW */
+            --secondary-color: #f0f2f5;
+            --text-color: #333;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .grid-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            /* Importante para el padding */
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 102, 177, 0.1);
+        }
+
+        button {
+            grid-column: 1 / -1;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #004c8c;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .success {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+            color: #0f5132;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #842029;
+        }
+
+        .price-tag {
+            font-size: 2.5rem;
+            font-weight: 800;
+            display: block;
+            margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🚘 Tasación de BMW Usados</h1>
+
+        <form method="POST" class="grid-form">
+
+            <div class="form-group">
+                <label for="model">Modelo del Vehículo</label>
+                <select id="model" name="model" required>
+                    <option value="" disabled {% if not form.model %}selected{% endif %}>Selecciona un modelo...
+                    </option>
+                    {% for m in models %}
+                    <option value="{{ m }}" {% if form.model==m %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="year">Año de Fabricación</label>
+                <input type="number" id="year" name="year" required min="1990" max="2025"
+                    value="{{ form.year or 2017 }}">
+            </div>
+
+            <div class="form-group">
+                <label for="transmission">Transmisión</label>
+                <select id="transmission" name="transmission">
+                    <option value="Automatic" {% if form.transmission=='Automatic' %}selected{% endif %}>Automático
+                    </option>
+                    <option value="Manual" {% if form.transmission=='Manual' %}selected{% endif %}>Manual</option>
+                    <option value="Semi-Auto" {% if form.transmission=='Semi-Auto' %}selected{% endif %}>Semi-Automático
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fuelType">Tipo de Combustible</label>
+                <select id="fuelType" name="fuelType">
+                    <option value="Diesel" {% if form.fuelType=='Diesel' %}selected{% endif %}>Diésel</option>
+                    <option value="Petrol" {% if form.fuelType=='Petrol' %}selected{% endif %}>Gasolina</option>
+                    <option value="Hybrid" {% if form.fuelType=='Hybrid' %}selected{% endif %}>Híbrido</option>
+                    <option value="Electric" {% if form.fuelType=='Electric' %}selected{% endif %}>Eléctrico</option>
+                    <option value="Other" {% if form.fuelType=='Other' %}selected{% endif %}>Otro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="mileage">Kilometraje</label>
+                <input type="number" id="mileage" name="mileage" required placeholder="Ej: 50000"
+                    value="{{ form.mileage }}">
+            </div>
+
+            <div class="form-group">
+                <label for="tax">Impuesto de Circulación (£/€)</label>
+                <input type="number" id="tax" name="tax" required value="{{ form.tax or 145 }}">
+            </div>
+
+            <div class="form-group">
+                <label for="mpg">Consumo (MPG)</label>
+                <input type="number" step="0.1" id="mpg" name="mpg" required value="{{ form.mpg or 50.0 }}">
+            </div>
+
+            <div class="form-group">
+                <label for="engineSize">Tamaño del Motor (L)</label>
+                <input type="number" step="0.1" id="engineSize" name="engineSize" required
+                    value="{{ form.engineSize or 2.0 }}">
+            </div>
+
+            <button type="submit">Calcular Valor Estimado</button>
+        </form>
+
+        {% if prediction %}
+        <div class="result-card success">
+            Valor Estimado de Mercado:
+            <span class="price-tag">{{ prediction }}</span>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="result-card error">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>
